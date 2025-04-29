@@ -582,8 +582,6 @@ Now Start Content Generation:
 6. Entities/Topics to Cover: **Note**: Your primary goal in this sub-step is to use each entity at least once within the content with a secondary goal of 8-10% entity density**
 {entities_text}
 
-
-
 IMPORTANT: Return ONLY the pure markdown content without any explanations, introductions, or notes about your approach.
 """
     
