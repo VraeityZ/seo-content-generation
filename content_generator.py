@@ -487,7 +487,6 @@ Do not wrap text. Shorten or simplify long content
 8. Never include explanatory text inside the table
 Add context before or after the table, not within it
 9. Avoid escape characters unless absolutely required
-Characters like \| or \* break clean rendering
 10. Put space below the table, so content flows well after the table.
 """
     
