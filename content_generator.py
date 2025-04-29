@@ -315,20 +315,21 @@ etc.]"""
     if "HEADING STRUCTURE:" in response['content']:
         heading_structure = response['content'].split("HEADING STRUCTURE:")[1].strip()
         
-        # Parse heading structure into individual headings
-        # This regex pattern finds markdown headings (e.g., # Heading, ## Heading)
-        heading_matches = re.findall(r'^(#+\s+.+?)$', heading_structure, re.MULTILINE)
+        # Keep the raw heading structure exactly as returned from the API
+        # Just split by lines and remove any completely blank lines
+        heading_lines = [line for line in heading_structure.split('\n') if line.strip()]
         
-        if heading_matches:
-            heading_lines = [line.strip() for line in heading_matches]
-        else:
-            # Fallback: look for H1, H2, etc. format
-            heading_matches = re.findall(r'^(H[1-6]:\s+.+?)$', heading_structure, re.MULTILINE)
-            if heading_matches:
-                heading_lines = [line.strip() for line in heading_matches]
-            else:
-                # Final fallback: just split by lines and filter out empty ones
-                heading_lines = [line.strip() for line in heading_structure.split('\n') if line.strip()]
+        # Only do minimal filtering to ensure we have actual headings
+        # This preserves the exact order and structure
+        filtered_heading_lines = []
+        for line in heading_lines:
+            # Keep only lines that look like headings (starting with # or H1:, etc.)
+            if line.strip().startswith('#') or re.match(r'^H[1-6]:', line.strip()):
+                filtered_heading_lines.append(line.strip())
+        
+        # If we found valid headings, use those, otherwise fall back to the raw lines
+        if filtered_heading_lines:
+            heading_lines = filtered_heading_lines
     
     return {
         "meta_title": meta_title,
