@@ -497,7 +497,7 @@ def stream_content_display():
         background-color: rgb(14 17 23);
         max-height: 600px;
         overflow-y: auto;
-        color: #333;
+        color: #fff;
         font-size: 14px;
         line-height: 1.5;
         white-space: pre-wrap;
@@ -511,7 +511,7 @@ def stream_content_display():
         background-color: rgb(14 17 23);
         max-height: 600px;
         overflow-y: auto;
-        color: #333;
+        color: #fff;
         font-size: 14px;
         line-height: 1.5;
         white-space: pre-wrap;
