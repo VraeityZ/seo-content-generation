@@ -1,10 +1,9 @@
 import anthropic
-import time
-from models import SEORequirements, HeadingTargets
+from models import SEORequirements
 from utils.logger import get_logger
 from utils.errors import GenerationError, ValidationError, expect
 import re
-
+ 
 # logger setup
 logger = get_logger(__name__)
 
@@ -217,7 +216,7 @@ You have a strong understanding of SEO best practices, entity based SEO and sema
 Please create a meta title, meta description, and heading structure for a piece of content about \"{primary_keyword}\".
 
 <requirements>
-- Business Info to include (if applicable):<business info> {business_data if business_data else 'None provided'}<business info>
+- Important business info and details to take into account. This is important information, follow it strictly and do not deviate from it. <business info> {business_data if business_data else 'None provided'}<business info>
 
 - Primary Keyword: {primary_keyword}
 - Variations to consider: {', '.join(variations)}
@@ -253,12 +252,12 @@ Please follow these guidelines for content structure:
 
 <step 2>
 1. Create a heading structure with the following requirements. No Less. Do your best to fit all the requirements within the heading counts provided below. You can fit multiple entities or requirements in a single heading without stuffing it, each heading should be user-friendly. 
-   - H1: {heading_structure.get("h1", 0)} headings
-   - H2: {heading_structure.get("h2", 0)} headings
-   - H3: {heading_structure.get("h3", 0)} headings
-   - H4: {heading_structure.get("h4", 0)} headings
-   - H5: {heading_structure.get("h5", 0)} headings
-   - H6: {heading_structure.get("h6", 0)} headings
+   - H1: {heading_structure.get("h1", 0)} headings - Do not create additional H1s unless absolutely necessary - IMPORTANT
+   - H2: {heading_structure.get("h2", 0)} headings - Do not create additional H2s unless absolutely necessary - IMPORTANT
+   - H3: {heading_structure.get("h3", 0)} headings - Do not create additional H3s unless absolutely necessary - IMPORTANT
+   - H4: {heading_structure.get("h4", 0)} headings - Do not create additional H4s unless absolutely necessary - IMPORTANT
+   - H5: {heading_structure.get("h5", 0)} headings - Do not create additional H5s unless absolutely necessary - IMPORTANT
+   - H6: {heading_structure.get("h6", 0)} headings - Do not create additional H6s unless absolutely necessary - IMPORTANT
 
 2. The headings should:
    - Contain the primary keyword and/or variations where appropriate
