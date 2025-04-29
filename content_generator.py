@@ -582,9 +582,8 @@ Now Start Content Generation:
 6. Entities/Topics to Cover: **Note**: Your primary goal in this sub-step is to use each entity at least once within the content with a secondary goal of 8-10% entity density**
 {entities_text}
 
-IMPORTANT: Return ONLY the pure markdown content without any explanations, introductions, or notes about your approach.
-"""
-    
+IMPORTANT: Return ONLY the pure markdown content without any explanations, introductions, or notes about your approach."""
+
     # Save the prompt to a file for reference
     with open("content_prompt.txt", "w", encoding="utf-8") as f:
         f.write(user_prompt)
