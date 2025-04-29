@@ -798,13 +798,7 @@ elif st.session_state.get("step", 1) == 2:
                         st.session_state.generated_markdown = accumulated_content[0]
                         html_content = accumulated_content[0].replace('\n', '<br>')
                         html = f"""
-                        <div style="
-                            height: 400px;
-                            overflow-y: auto;
-                            border: 1px solid #ddd;
-                            padding: 8px;
-                            background: #fff;
-                        ">
+                        <div class="content-container">
                             {html_content}
                         </div>
                         """
@@ -940,7 +934,7 @@ elif st.session_state.get("step", 1) == 2:
                 if 'accumulated_thinking' in st.session_state:
                     st.markdown(
                         """
-                        <div style='max-height:300px;overflow-y:auto;border:1px solid #ccc;padding:8px;background:#fafbfc;color:#111;'>
+                        <div class="content-container">
                         {content}
                         </div>
                         """.format(content=st.session_state.accumulated_thinking.replace('\n', '<br>')),
@@ -995,7 +989,7 @@ elif st.session_state.get("step", 1) == 2.5:
         if 'persistent_thinking_process' in st.session_state and st.session_state['persistent_thinking_process']:
             st.markdown(
                 """
-                <div style='max-height:300px;overflow-y:auto;border:1px solid #ccc;padding:8px;'>
+                <div class="content-container">
                 {content}
                 </div>
                 """.format(content=st.session_state['persistent_thinking_process'].replace('\n', '<br>')),
@@ -1005,7 +999,7 @@ elif st.session_state.get("step", 1) == 2.5:
         elif 'headings_thinking_process' in st.session_state:
             st.markdown(
                 """
-                <div style='max-height:300px;overflow-y:auto;border:1px solid #ccc;padding:8px;'>
+                <div class="content-container">
                 {content}
                 </div>
                 """.format(content=st.session_state.headings_thinking_process.replace('\n', '<br>')),
@@ -1472,7 +1466,7 @@ elif st.session_state.get("step", 1) == 2.5:
     elif st.session_state.get('auto_generate_content', False):
         # re-run content generation flow only when explicitly requested
         generate_content_flow()
-    
+     
     
 
 elif st.session_state.get("step", 1) == 3:
@@ -1481,11 +1475,15 @@ elif st.session_state.get("step", 1) == 3:
 
     # If content hasn't been generated yet, generate it
     # If content hasn't been generated yet, generate it
-    if 'generated_markdown' not in st.session_state or not st.session_state.generated_markdown or st.session_state.get('force_regenerate', False):
-        # Reset force_regenerate flag if it exists
-        if 'force_regenerate' in st.session_state:
-            st.session_state.pop('force_regenerate')
-            
+    if (
+        'generated_markdown' not in st.session_state 
+        or not st.session_state.generated_markdown 
+        or st.session_state.get('force_regenerate', False) 
+        or st.session_state.get('auto_generate_content', False)
+    ):
+        # Reset flags immediately
+        st.session_state.pop('force_regenerate', None)
+        st.session_state['auto_generate_content'] = False
         # Get streaming content display components
         content_placeholder, status_placeholder, thinking_placeholder = stream_content_display()
         
@@ -1534,13 +1532,7 @@ elif st.session_state.get("step", 1) == 3:
                                 st.session_state.accumulated_content = accumulated_content[0]
                                 html_content = accumulated_content[0].replace('\n', '<br>')
                                 html = f"""
-                                <div style="
-                                    height: 400px;
-                                    overflow-y: auto;
-                                    border: 1px solid #ddd;
-                                    padding: 8px;
-                                    background: #fff;
-                                ">
+                                <div class="content-container">
                                     {html_content}
                                 </div>
                                 """
@@ -1633,53 +1625,53 @@ elif st.session_state.get("step", 1) == 3:
                         
                         return response
 
-                    # Call the streaming version directly
-                    response = generate_content_with_streaming()
-                    
-                    # Process the response data
-                    st.session_state.generated_markdown = response.get("content", "")
-                    st.session_state.generated_html = markdown_to_html(st.session_state.generated_markdown)
-                    st.session_state.content_generation_complete = True
-                    
-                    st.session_state.content_thinking_process = response.get("thinking", "")
-                    
-                    # Save meta information to session state
+                # Call the streaming version directly
+                response = generate_content_with_streaming()
+                
+                # Process the response data
+                st.session_state.generated_markdown = response.get("content", "")
+                st.session_state.generated_html = markdown_to_html(st.session_state.generated_markdown)
+                st.session_state.content_generation_complete = True
+                
+                st.session_state.content_thinking_process = response.get("thinking", "")
+                
+                # Save meta information to session state
+                if response.get("meta_title"):
+                    st.session_state["meta_title_input"] = response.get("meta_title")
+                if response.get("meta_description"):
+                    st.session_state["meta_desc_input"] = response.get("meta_description")
+                
+                # Update meta_and_headings dictionary
+                if "meta_and_headings" in st.session_state:
                     if response.get("meta_title"):
-                        st.session_state["meta_title_input"] = response.get("meta_title")
+                        st.session_state.meta_and_headings["meta_title"] = response.get("meta_title")
                     if response.get("meta_description"):
-                        st.session_state["meta_desc_input"] = response.get("meta_description")
-                    
-                    # Update meta_and_headings dictionary
-                    if "meta_and_headings" in st.session_state:
-                        if response.get("meta_title"):
-                            st.session_state.meta_and_headings["meta_title"] = response.get("meta_title")
-                        if response.get("meta_description"):
-                            st.session_state.meta_and_headings["meta_description"] = response.get("meta_description")
-                        if response.get("headings"):
-                            st.session_state.meta_and_headings["headings"] = response.get("headings")
-                    
-                    # Store thinking process
+                        st.session_state.meta_and_headings["meta_description"] = response.get("meta_description")
+                    if response.get("headings"):
+                        st.session_state.meta_and_headings["headings"] = response.get("headings")
+                
+                # Store thinking process
+                if 'accumulated_thinking' in st.session_state:
+                    if 'content_thinking_process' not in st.session_state:
+                        st.session_state.content_thinking_process = st.session_state.get('accumulated_thinking', '')
+                    else:
+                        # Append to existing thinking content
+                        st.session_state.content_thinking_process += st.session_state.accumulated_thinking
+                
+                # Debug expander for thinking process
+                with st.expander("Debug - Content Generation Thinking Process", expanded=False):
                     if 'accumulated_thinking' in st.session_state:
-                        if 'content_thinking_process' not in st.session_state:
-                            st.session_state.content_thinking_process = st.session_state.get('accumulated_thinking', '')
-                        else:
-                            # Append to existing thinking content
-                            st.session_state.content_thinking_process += st.session_state.accumulated_thinking
-                    
-                    # Debug expander for thinking process
-                    with st.expander("Debug - Content Generation Thinking Process", expanded=False):
-                        if 'accumulated_thinking' in st.session_state:
-                            st.markdown(
-                                """
-                                <div style='max-height:300px;overflow-y:auto;border:1px solid #ccc;padding:8px;background:#fafbfc;color:#111;'>
-                                {content}
-                                </div>
-                                """.format(content=st.session_state.accumulated_thinking.replace('\n', '<br>')),
-                                unsafe_allow_html=True
-                            )
-                    
-                    status_placeholder.success("Generation complete!")
-                    st.rerun()  # Refresh to update UI
+                        st.markdown(
+                            """
+                            <div class="content-container">
+                            {content}
+                            </div>
+                            """.format(content=st.session_state.accumulated_thinking.replace('\n', '<br>')),
+                            unsafe_allow_html=True
+                        )
+                
+                status_placeholder.success("Generation complete!")
+                st.rerun()  # Refresh to update UI
             except Exception as e:
                 st.error(f"Error generating content: {str(e)}")
                 st.error(traceback.format_exc())
@@ -1772,13 +1764,7 @@ def generate_and_display_content():
                         st.session_state.accumulated_content = accumulated_content[0]
                         html_content = accumulated_content[0].replace('\n', '<br>')
                         html = f"""
-                        <div style="
-                            height: 400px;
-                            overflow-y: auto;
-                            border: 1px solid #ddd;
-                            padding: 8px;
-                            background: #fff;
-                        ">
+                        <div class="content-container">
                             {html_content}
                         </div>
                         """
@@ -1955,7 +1941,7 @@ def generate_and_display_content():
                 if 'accumulated_thinking' in st.session_state:
                     st.markdown(
                         """
-                        <div style='max-height:300px;overflow-y:auto;border:1px solid #ccc;padding:8px;background:#fafbfc;color:#111;'>
+                        <div class="content-container">
                         {content}
                         </div>
                         """.format(content=st.session_state.accumulated_thinking.replace('\n', '<br>')),
@@ -2000,7 +1986,7 @@ def generate_and_display_content():
                     with st.expander("Debug - Non-streaming Thinking Process", expanded=False):
                         st.markdown(
                             """
-                            <div style='max-height:300px;overflow-y:auto;border:1px solid #ccc;padding:8px;background:#fafbfc;color:#111;'>
+                            <div class="content-container">
                             {content}
                             </div>
                             """.format(content=response['thinking'].replace('\n', '<br>')),
