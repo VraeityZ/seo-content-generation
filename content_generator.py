@@ -275,7 +275,7 @@ Format your response exactly like this:
 META TITLE: [Your meta title here]
 META DESCRIPTION: [Your meta description here]
 HEADING STRUCTURE:
-[Complete markdown user journey friendly heading structure with # for H1, ## for H2, etc. Provided in order of the exact page layout eg.
+[You must always return a Complete markdown user journey friendly heading structure with # for H1, ## for H2, etc. Provided in order of the exact page layout eg.
 # Heading 1
 ## Heading 2
 ### Heading 3
